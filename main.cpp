@@ -12,14 +12,14 @@ double f(double x, double y)
     return x * y;
 }
 
-void create_data_set(int n)
+void gen_set(const string& path, int n)
 {
     random_device dev;
     mt19937 rng(dev());
     uniform_real_distribution<> dist(-100, 100);
 
     ofstream data_file;
-    data_file.open("../set.csv");
+    data_file.open(path);
     if (data_file.is_open())
     {
         data_file << "x,y,f\n";
@@ -171,15 +171,10 @@ private:
     vector<double> maxes;
 };
   
-int main()
+auto create_dataset(const string& path)
 {
-//    create_data_set(100);
-
-//    Net net(32);
-//    for (const auto& p : net.parameters())
-//        cout << p << endl;
-   
-    auto dataset = MyDataset("../set.csv")
+    auto dataset = MyDataset(path)
+        .map(torch::data::transforms::Normalize<>(0.5, 0.5))
         .map(torch::data::transforms::Stack<>());
 
     int64_t batch_size = 64;
@@ -187,7 +182,22 @@ int main()
             move(dataset), 
             torch::data::DataLoaderOptions().batch_size(batch_size));
 
-    for (auto& batch : *data_loader)
+    return data_loader;
+}
+
+int main()
+{
+//    gen_set("../train.csv", 80000);
+//    gen_set("../val.csv", 20000);
+
+//    Net net(32);
+//    for (const auto& p : net.parameters())
+//        cout << p << endl;
+   
+    auto train_set = create_dataset("../train.csv");    
+    auto val_set = create_dataset("../val.csv");    
+
+    for (auto& batch : *val_set)
     {
         cout << "Batch size: " << batch.data.size(0) << " | Labels: ";
         for (int64_t i = 0; i < batch.data.size(0); ++i)
