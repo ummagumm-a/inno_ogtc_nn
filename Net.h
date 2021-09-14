@@ -2,7 +2,6 @@
 #define NET_H
 
 #include <torch/torch.h>
-#include <iostream>
 
 struct NetImpl : torch::nn::Module
 {
@@ -14,13 +13,9 @@ struct NetImpl : torch::nn::Module
 
     torch::Tensor forward(torch::Tensor x)
     {
-//        cout << "x1: " << x << endl;
         x = torch::nn::functional::relu(linear1(x));
-//        cout << "x2: " << x << endl;
         x = torch::nn::functional::relu(linear2(x));
-//        cout << "x3: " << x << endl;
         x = linear3(x);
-//        cout << "x4: " << x << endl;
         return x;
     }
     

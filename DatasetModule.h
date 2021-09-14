@@ -51,7 +51,7 @@ public:
     static vector<vector<double>> read_data(const std::string& loc);
 
     // create dataset and return dataloader
-    static decltype(auto) create_dataset(const string& path, int batch_size)
+    static decltype(auto) create_dataset(const string& path, int batch_size = 512)
     {
         auto tmp = MyDataset(path);
         tmp.normalize();

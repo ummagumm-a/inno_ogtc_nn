@@ -3,6 +3,9 @@ project(inno_ogtc_nn)
 
 find_package(Torch REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp DatasetModule.h DatasetModule.cpp)
+add_executable(${PROJECT_NAME} main.cpp 
+    DatasetModule.h DatasetModule.cpp
+    NetProcessing.h NetProcessing.cpp
+    Net.h)
 target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
