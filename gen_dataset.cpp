@@ -35,10 +35,13 @@ void gen_set(const string& path, int n)
     data_file.close();
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    gen_set("../train.csv", 350000);
-    gen_set("../val.csv", 150000);
+    if (argc == 3)
+    {
+        gen_set("../train.csv", stoi(argv[1]));
+        gen_set("../val.csv", stoi(argv[2]));
+    }
 
     return 0;
 }
