@@ -76,26 +76,24 @@ torch::optional<size_t> DatasetModule::MyDataset::size() const
     return dset.size();
 }
 
-void DatasetModule::MyDataset::find_max(vector<vector<double>> vecs)
-{
-    vector<double> max_vec;
-
-    for (const auto& t : vecs)
-        for (int i = 0; i < t.size(); ++i)
-            max_vec[i] = max(max_vec[i], t[i]);
-
-    maxes = max_vec;
-}
-
 void DatasetModule::MyDataset::normalize_line(vector<double>& line)
 {
-    for (int i = 0; i < maxes.size(); ++i)
+    for (int i = 0; i < line.size(); ++i)
         line[i] /= maxes[i];
 }
     
 void DatasetModule::MyDataset::unnormalize_line(vector<double>& line)
 {
-    for (int i = 0; i < maxes.size(); ++i)
+    for (int i = 0; i < line.size(); ++i)
         line[i] *= maxes[i];
 }
  
+void DatasetModule::MyDataset::print_dataset() const
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        for (const auto& pp : dset[i])
+            cout << pp << " ";
+        cout << endl;
+    }
+}

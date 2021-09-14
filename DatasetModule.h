@@ -18,7 +18,9 @@ public:
         // where the data is stored
         explicit MyDataset(const string& loc)
             : dset(read_data(loc)) 
-        {}
+        {
+            maxes = { 100, 100, 10000 };
+        }
 
         // return one line from a dataset
         torch::data::Example<> get(size_t index) override;
@@ -28,9 +30,9 @@ public:
         void unnormalize();
         // returns the size of the dataset
         torch::optional<size_t> size() const override;
+
+        void print_dataset() const;
     private:
-        // find max values for each column in the whole dataset
-        void find_max(vector<vector<double>> vecs);
         // normalize one line of a dataset
         void normalize_line(vector<double>& line);
         // unnormalize one line of a dataset
@@ -49,13 +51,14 @@ public:
     static vector<vector<double>> read_data(const std::string& loc);
 
     // create dataset and return dataloader
-    static decltype(auto) create_dataset(const string& path)
+    static decltype(auto) create_dataset(const string& path, int batch_size)
     {
-        auto dataset = MyDataset(path)
-            .map(torch::data::transforms::Normalize<>(0.5, 0.5))
+        auto tmp = MyDataset(path);
+        tmp.normalize();
+
+        auto dataset = tmp
             .map(torch::data::transforms::Stack<>());
 
-        int64_t batch_size = 64;
         auto data_loader = torch::data::make_data_loader(
                 move(dataset), 
                 torch::data::DataLoaderOptions().batch_size(batch_size));
