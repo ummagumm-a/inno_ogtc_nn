@@ -39,8 +39,8 @@ int main(int argc, char **argv)
 {
     if (argc == 3)
     {
-        gen_set("../train.csv", stoi(argv[1]));
-        gen_set("../val.csv", stoi(argv[2]));
+        gen_set("../datasets/train.csv", stoi(argv[1]));
+        gen_set("../datasets/val.csv", stoi(argv[2]));
     }
 
     return 0;
