@@ -1,2 +1,4 @@
 build/
 main
+best_model/
+model.pt
