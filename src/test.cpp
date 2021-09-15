@@ -10,7 +10,7 @@ using namespace std;
 
 vector<int64_t> load_net_info()
 {
-    ifstream net_info("../net_info.txt");
+    ifstream net_info("net_info.txt");
     vector<int64_t> vec;
     int64_t tmp;
     if (net_info.is_open())
@@ -30,7 +30,7 @@ int main()
     Net net(mn[0], mn[1]);
     net->to(torch::kFloat64);
 
-    torch::load(net, "../model.pt");
+    torch::load(net, "model.pt");
     cout << "Model is loaded" << endl;
  
     cout << endl << "Print number of examples that you want to check" << endl;

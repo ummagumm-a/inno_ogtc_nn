@@ -1,4 +1,5 @@
 #include <torch/torch.h>
+#include <iostream>
 
 #include "NetProcessing.h"
 #include "DatasetModule.h"
@@ -15,12 +16,12 @@ double NetProcessing::test(Net& net,
     for (torch::data::Example<>& batch : *test_set)
     {
         net->zero_grad();
+        auto size = batch.data.size(0);
         torch::Tensor data = batch.data;
         torch::Tensor labels = batch.target;
         torch::Tensor output = net->forward(data.to(torch::kFloat64));
 
-        torch::Tensor d_loss = torch::nn::functional::mse_loss(output, labels);
-        av_loss += d_loss.item<double>();
+        av_loss += torch::nn::functional::mse_loss(output, labels).item<double>();
         count++;
     }
 
@@ -28,10 +29,11 @@ double NetProcessing::test(Net& net,
 }
 
 void NetProcessing::train(Net& net, 
+           double learning_rate,
            const string& train_set_location,
            int number_of_epochs)
 {
-    torch::optim::Adam net_optimizer(net->parameters(), torch::optim::AdamOptions(3e-5));
+    torch::optim::Adam net_optimizer(net->parameters(), torch::optim::AdamOptions(learning_rate));
    
     auto train_set = DatasetModule::create_dataset(train_set_location);    
     
@@ -42,6 +44,7 @@ void NetProcessing::train(Net& net,
 
         for (torch::data::Example<>& batch : *train_set)
         {
+            net->zero_grad();
             torch::Tensor data = batch.data;
             torch::Tensor labels = batch.target;
             torch::Tensor output = net->forward(data.to(torch::kFloat64));
@@ -53,7 +56,24 @@ void NetProcessing::train(Net& net,
             av_loss += d_loss.item<double>();
             count++;
         }
-        printf("train: %.07lf\ttest: %.07lf\n", av_loss / (double) count, test(net));
+        printf("epoch [%d/%d]\ttrain: %.07lf\ttest: %.07lf\n", 
+                epoch,
+                number_of_epochs, 
+                av_loss / (double) count, 
+                test(net));
     }
 }
 
+double NetProcessing::use(Net& net, vector<double>& data)
+{
+    data = { data[0] / 100, data[1] / 100 };
+
+    auto options = torch::TensorOptions().dtype(torch::kFloat64);
+    torch::Tensor t_data = torch::from_blob(data.data(), 
+            {data.size()}, 
+            options).clone();
+
+
+    net->zero_grad();
+    return 10000 * net->forward(t_data.to(torch::kFloat64)).item<double>();
+}
