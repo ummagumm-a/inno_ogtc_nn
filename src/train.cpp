@@ -17,8 +17,7 @@ void save_net_info(int64_t m, int64_t n, int64_t k)
 }
 
 int main(int argc, char** argv)
-{
-    int64_t m, n, k;
+{ int64_t m, n, k;
     double lr;
     int n_epochs;
 
@@ -46,7 +45,7 @@ int main(int argc, char** argv)
     NetProcessing::train(net, lr, "../datasets/train.csv", n_epochs);
     cout << "Model is trained" << endl;
     torch::save(net, "model.pt");
-    save_net_info(m, n);
+    save_net_info(m, n, k);
     cout << "Model is saved." << endl;
 
     return 0;

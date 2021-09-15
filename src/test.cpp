@@ -19,6 +19,8 @@ vector<int64_t> load_net_info()
         vec.push_back(tmp);
         net_info >> tmp;
         vec.push_back(tmp);
+        net_info >> tmp;
+        vec.push_back(tmp);
     }
 
     return vec;
@@ -27,7 +29,7 @@ vector<int64_t> load_net_info()
 int main()
 {
     vector<int64_t> mn = load_net_info();
-    Net net(mn[0], mn[1]);
+    Net net(mn[0], mn[1], mn[2]);
     net->to(torch::kFloat64);
 
     torch::load(net, "model.pt");

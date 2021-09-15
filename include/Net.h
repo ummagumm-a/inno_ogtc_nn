@@ -8,7 +8,7 @@ struct NetImpl : torch::nn::Module
     NetImpl(int64_t m, int64_t n, int64_t k)
         : linear1(register_module("linear1", torch::nn::Linear(2, m))),
           linear2(register_module("linear2", torch::nn::Linear(m, n))),
-          linear3(register_module("linear3", torch::nn::Linear(n, k)))
+          linear3(register_module("linear3", torch::nn::Linear(n, k))),
           linear4(register_module("linear4", torch::nn::Linear(k, 1)))
     {}
 
