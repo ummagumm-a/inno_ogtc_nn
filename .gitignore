@@ -1,5 +1,3 @@
 build/
-main
 best_model/
-model.pt
-net_info.txt
+visualization/*.txt
