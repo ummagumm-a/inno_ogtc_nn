@@ -86,6 +86,14 @@ void DatasetModule::MyDataset::unnormalize_line(vector<double>& line)
     for (int i = 0; i < line.size(); ++i)
         line[i] *= maxes[i];
 }
+
+void DatasetModule::MyDataset::find_maxes()
+{
+    maxes = dset[0];
+    for (int i = 0; i < dset.size(); ++i)
+        for (int j = 0; j < dset[0].size(); ++j)
+            maxes[j] = max(maxes[j], abs(dset[i][j]));
+}
  
 void DatasetModule::MyDataset::print_dataset() const
 {

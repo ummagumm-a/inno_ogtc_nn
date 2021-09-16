@@ -19,7 +19,7 @@ public:
         explicit MyDataset(const string& loc)
             : dset(read_data(loc)) 
         {
-            maxes = { 100, 100, 10000 };
+            find_maxes();
         }
 
         // return one line from a dataset
@@ -37,6 +37,8 @@ public:
         void normalize_line(vector<double>& line);
         // unnormalize one line of a dataset
         void unnormalize_line(vector<double>& line);
+        //
+        void find_maxes();
     private: 
         // matrix of values in a dataset
         vector<vector<double>> dset;
