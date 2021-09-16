@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "Net.h"
 
@@ -18,6 +19,8 @@ public:
             int number_of_epochs = 30);
 
     static double use(Net& net, std::vector<double>& data);
+
+    static void save_loss_data(std::vector<double>, std::string dest);
 };
 
 #endif
