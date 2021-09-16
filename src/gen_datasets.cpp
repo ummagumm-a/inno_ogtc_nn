@@ -37,10 +37,11 @@ void gen_set(const string& path, int n)
 
 int main(int argc, char **argv)
 {
-    if (argc == 3)
+    if (argc == 4)
     {
         gen_set("../datasets/train.csv", stoi(argv[1]));
         gen_set("../datasets/val.csv", stoi(argv[2]));
+        gen_set("../datasets/test.csv", stoi(argv[3]));
     }
 
     return 0;
