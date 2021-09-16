@@ -36,6 +36,9 @@ void NetProcessing::train(Net& net,
     torch::optim::Adam net_optimizer(net->parameters(), torch::optim::AdamOptions(learning_rate));
    
     auto train_set = DatasetModule::create_dataset(train_set_location);    
+
+    vector<DataToSave> train_loss_log;
+    vector<DataToSave> test_loss_log;
     
     for (int64_t epoch = 1; epoch <= number_of_epochs; ++epoch)
     {
@@ -56,12 +59,24 @@ void NetProcessing::train(Net& net,
             av_loss += d_loss.item<double>();
             count++;
         }
+        double train_loss = av_loss / (double) count;
+        double test_loss = test(net);
+
+        // print result on this epoch
         printf("epoch [%d/%d]\ttrain: %.07lf\ttest: %.07lf\n", 
                 epoch,
                 number_of_epochs, 
-                av_loss / (double) count, 
-                test(net));
+                train_loss,
+                test_loss);
+
+        // save info about loss on this epoch
+        train_loss_log.push_back({ epoch, train_loss });
+        test_loss_log.push_back({ epoch, test_loss });
     }
+
+    // save all info about loss while training and testing
+    save_loss_data(train_loss_log, "train_loss.txt");
+    save_loss_data(test_loss_log, "test_loss.txt");
 }
 
 double NetProcessing::use(Net& net, vector<double>& data)
@@ -76,4 +91,17 @@ double NetProcessing::use(Net& net, vector<double>& data)
 
     net->zero_grad();
     return 10000 * net->forward(t_data.to(torch::kFloat64)).item<double>();
+}
+
+void NetProcessing::save_loss_data(vector<DataToSave> data, string dest)
+{
+    ofstream loss_data("../visualization/" + dest);
+
+    if (loss_data.is_open())
+        for (int i = 0; i < data.size(); ++i)
+            loss_data << data[i].epoch << " " << data[i].loss << endl;
+    else
+        cout << "Problems with loss_data" << endl;
+
+    loss_data.close();
 }
