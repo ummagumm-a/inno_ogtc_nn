@@ -19,8 +19,16 @@ target_link_libraries(train "${TORCH_LIBRARIES}")
 target_link_libraries(train cppLib)
 set_property(TARGET train PROPERTY CXX_STANDARD 14)
 
+add_executable(man_test src/man_test.cpp)
+
+target_link_libraries(man_test "${TORCH_LIBRARIES}")
+target_link_libraries(man_test cppLib)
+set_property(TARGET man_test PROPERTY CXX_STANDARD 14)
+
 add_executable(test src/test.cpp)
 
 target_link_libraries(test "${TORCH_LIBRARIES}")
 target_link_libraries(test cppLib)
 set_property(TARGET test PROPERTY CXX_STANDARD 14)
+
+

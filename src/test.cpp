@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <utility>
 #include <torch/torch.h>
 
 #include "Net.h"
 #include "NetProcessing.h"
+#include "DatasetModule.h"
 
 using namespace std;
 
@@ -26,6 +28,22 @@ vector<int64_t> load_net_info()
     return vec;
 }
 
+void save_data(vector<pair<double, double>> xy, vector<double> label, vector<double> output)
+{
+    ofstream data("../visualization/act_vs_pred.txt");
+
+    if (data.is_open())
+        for (int i = 0; i < xy.size(); ++i)
+            data << xy[i].first << " "
+                 << xy[i].second << " "
+                 << label[i] << " "
+                 << output[i] << endl;
+    else
+        cout << "Problems with opening file for saving test info." << endl;
+
+    data.close();
+}
+
 int main()
 {
     vector<int64_t> mn = load_net_info();
@@ -35,19 +53,33 @@ int main()
     torch::load(net, "model.pt");
     cout << "Model is loaded" << endl;
  
-    cout << endl << "Print number of examples that you want to check" << endl;
-    int n;
-    cin >> n;
+    auto dataset = DatasetModule::MyDataset("../datasets/test.csv");
+    dataset.normalize();
+    auto data_loader = torch::data::make_data_loader(
+            move(dataset),
+            torch::data::DataLoaderOptions().batch_size(64));
 
-    double x, y;
-    vector<double> inp_vec;
-    cout << "Print each example in the format <x y>" << endl;
-    for (int i = 0; i < n; ++i)
+    vector<pair<double, double>> xy_vec;
+    vector<double> labels_vec;
+    vector<double> output_vec;
+
+    for (auto batch : *data_loader)
     {
-        cin >> x >> y;
-        inp_vec = { x, y };
-        cout << "Answer: " << NetProcessing::use(net, inp_vec) << endl;
+        for (torch::data::Example<>& el : batch)
+        {
+            net->zero_grad();
+            auto size = el.data.size(0);
+
+            torch::Tensor output = net->forward(el.data.to(torch::kFloat64));
+
+            xy_vec.push_back({ el.data[0].item<double>(), el.data[1].item<double>() });
+            labels_vec.push_back(el.target.item<double>());
+            output_vec.push_back(output.item<double>());
+
+        }
     }
+
+    save_data(xy_vec, labels_vec, output_vec);
 
     return 0;
 }

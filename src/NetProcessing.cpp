@@ -6,14 +6,14 @@
 
 using namespace std;
 
-double NetProcessing::test(Net& net, 
-            const string& test_set_location)
+double NetProcessing::validate(Net& net, 
+            const string& val_set_location)
 {
-    static auto test_set = DatasetModule::create_dataset(test_set_location);    
+    static auto val_set = DatasetModule::create_dataset(val_set_location);    
 
     int count = 0;
     double av_loss = 0;
-    for (torch::data::Example<>& batch : *test_set)
+    for (torch::data::Example<>& batch : *val_set)
     {
         net->zero_grad();
         auto size = batch.data.size(0);
@@ -38,7 +38,7 @@ void NetProcessing::train(Net& net,
     auto train_set = DatasetModule::create_dataset(train_set_location);    
 
     vector<double> train_loss_log;
-    vector<double> test_loss_log;
+    vector<double> val_loss_log;
     
     for (int64_t epoch = 1; epoch <= number_of_epochs; ++epoch)
     {
@@ -60,23 +60,23 @@ void NetProcessing::train(Net& net,
             count++;
         }
         double train_loss = av_loss / (double) count;
-        double test_loss = test(net);
+        double val_loss = validate(net);
 
         // print result on this epoch
-        printf("epoch [%d/%d]\ttrain: %.07lf\ttest: %.07lf\n", 
+        printf("epoch [%d/%d]\ttrain loss: %.07lf\tvalidation loss: %.07lf\n", 
                 epoch,
                 number_of_epochs, 
                 train_loss,
-                test_loss);
+                val_loss);
 
         // save info about loss on this epoch
         train_loss_log.push_back(train_loss);
-        test_loss_log.push_back(test_loss);
+        val_loss_log.push_back(val_loss);
     }
 
-    // save all info about loss while training and testing
+    // save all info about loss while training and validating
     save_loss_data(train_loss_log, "train_loss.txt");
-    save_loss_data(test_loss_log, "test_loss.txt");
+    save_loss_data(val_loss_log, "val_loss.txt");
 }
 
 double NetProcessing::use(Net& net, vector<double>& data)
