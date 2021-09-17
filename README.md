@@ -39,3 +39,5 @@ run *python3* *visualize_data.py*
 ## Example
 ### x * y
 It worked well for me: __./train__ 64 32 16 0.00006 100
+![Figure_1](https://user-images.githubusercontent.com/70323559/133744685-a2f3e70a-cfce-4b60-a806-8e815f43cfc1.png)
+
